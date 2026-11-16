@@ -1,5 +1,5 @@
 // Cambia VERSION cada vez que modifiques HTML, CSS o JS
-const VERSION = 'v2';
+const VERSION = 'v3';
 const CACHE_APP = `claves-app-${VERSION}`;
 const CACHE_DATOS = 'claves-datos'; // se conserva entre versiones
 
@@ -51,6 +51,8 @@ self.addEventListener('fetch', event => {
 
   const url = new URL(req.url);
   if (url.origin !== location.origin) return;
+  // El administrador siempre va directo al servidor
+  if (url.pathname.startsWith('/api/admin') || url.pathname === '/admin.html' || url.pathname === '/js/admin.js') return;
 
   if (url.pathname.startsWith('/api/')) {
     event.respondWith(redPrimero(url.pathname + url.search));
