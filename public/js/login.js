@@ -8,8 +8,8 @@ const reducirMovimiento = window.matchMedia('(prefers-reduced-motion: reduce)').
 (function revisarSesionActual() {
   const s = leerSesion();
   if (!s) return;
-  if (s.tipo === 'admin') location.replace('/admin.html');
-  else if (!pideAdmin) location.replace('/');
+  if (s.tipo === 'admin') location.replace('admin.html');
+  else if (!pideAdmin) location.replace('./');
 })();
 
 if (parametros.has('expirada')) {
@@ -94,7 +94,7 @@ function agitar(elemento) {
 $('btn-alumno').addEventListener('click', e => {
   onda(e.currentTarget, e);
   guardarSesion({ tipo: 'alumno' });
-  salirHacia('/');
+  salirHacia('./');
 });
 
 /* ================= Administrador ================= */
@@ -151,7 +151,7 @@ $('form-admin').addEventListener('submit', async e => {
   texto.textContent = 'Verificando';
 
   try {
-    const r = await fetch('/api/admin/login', {
+    const r = await fetch('api/admin/login', {
       method: 'POST',
       headers: { ...API_HEADERS, 'Content-Type': 'application/json' },
       body: JSON.stringify({ usuario, password })
@@ -163,7 +163,7 @@ $('form-admin').addEventListener('submit', async e => {
     boton.classList.remove('cargando');
     boton.classList.add('exito');
     texto.textContent = `✓ Bienvenida(o), ${data.nombre.split(' ')[0]}`;
-    setTimeout(() => salirHacia('/admin.html'), reducirMovimiento ? 0 : 450);
+    setTimeout(() => salirHacia('admin.html'), reducirMovimiento ? 0 : 450);
   } catch (err) {
     error.textContent = err.message === 'Failed to fetch'
       ? 'No se pudo conectar con el servidor.'
@@ -310,7 +310,7 @@ function contar(el, hasta) {
 
 (async function cargarCifras() {
   try {
-    const claves = await api('/api/claves');
+    const claves = await api('api/claves');
     const especies = new Set();
     claves.forEach(c => (c.especies ? c.especies.split('|') : []).forEach(e => especies.add(e)));
     setTimeout(() => {

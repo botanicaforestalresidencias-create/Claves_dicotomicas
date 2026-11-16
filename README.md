@@ -21,7 +21,7 @@ pm2 start ecosystem.config.js
 pm2 save
 ```
 
-Abre http://localhost:3001
+Abre http://localhost:3001/claves/
 
 ## Acceso
 

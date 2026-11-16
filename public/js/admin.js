@@ -21,7 +21,7 @@ function avisar(mensaje, tipo = 'ok') {
 
 function sesionExpirada() {
   guardarSesion(null);
-  location.replace('/login.html?admin=1&expirada=1');
+  location.replace('login.html?admin=1&expirada=1');
 }
 
 async function apiAdmin(metodo, ruta, cuerpo) {
@@ -67,7 +67,7 @@ async function cargarLista() {
   const ul = $('admin-lista');
   ul.innerHTML = '<li class="vacio">Cargando…</li>';
   try {
-    const claves = await api('/api/claves');
+    const claves = await api('api/claves');
     if (!claves.length) {
       ul.innerHTML = '<li class="vacio">Aún no hay claves. Crea la primera con “Nueva clave”.</li>';
       return;
@@ -81,7 +81,7 @@ async function cargarLista() {
           <span class="meta">${n} ${n === 1 ? 'especie' : 'especies'}</span>
         </div>
         <div class="grupo-botones">
-          <a class="boton" href="/clave.html?id=${c.id}" target="_blank" rel="noopener">Ver</a>
+          <a class="boton" href="clave.html?id=${c.id}" target="_blank" rel="noopener">Ver</a>
           <button class="boton" type="button" data-editar="${c.id}">Editar</button>
           <button class="boton peligro" type="button" data-eliminar="${c.id}"
                   data-titulo="${esc(c.titulo)}">Eliminar</button>
@@ -99,7 +99,7 @@ $('admin-lista').addEventListener('click', async e => {
 
   if (editar) {
     try {
-      const data = await api('/api/claves/' + editar.dataset.editar);
+      const data = await api('api/claves/' + editar.dataset.editar);
       abrirEditor(data);
     } catch (err) {
       avisar('No se pudo abrir la clave', 'error');
@@ -110,7 +110,7 @@ $('admin-lista').addEventListener('click', async e => {
     const titulo = eliminar.dataset.titulo;
     if (!confirm(`¿Eliminar “${titulo}”?\nEsta acción no se puede deshacer.`)) return;
     try {
-      await apiAdmin('DELETE', '/api/admin/claves/' + eliminar.dataset.eliminar);
+      await apiAdmin('DELETE', 'api/admin/claves/' + eliminar.dataset.eliminar);
       avisar('Clave eliminada');
       cargarLista();
     } catch (err) {
@@ -165,7 +165,7 @@ function actualizarCabeceraEditor() {
   $('editor-titulo').textContent = editor.id ? 'Editar clave' : 'Nueva clave';
   const ver = $('btn-ver');
   ver.classList.toggle('oculto', !editor.id);
-  if (editor.id) ver.href = '/clave.html?id=' + editor.id;
+  if (editor.id) ver.href = 'clave.html?id=' + editor.id;
 }
 
 function filaOpcion(d, v) {
@@ -334,9 +334,9 @@ $('btn-guardar').addEventListener('click', async () => {
   boton.textContent = 'Guardando…';
   try {
     if (editor.id) {
-      await apiAdmin('PUT', '/api/admin/claves/' + editor.id, cuerpo);
+      await apiAdmin('PUT', 'api/admin/claves/' + editor.id, cuerpo);
     } else {
-      const r = await apiAdmin('POST', '/api/admin/claves', cuerpo);
+      const r = await apiAdmin('POST', 'api/admin/claves', cuerpo);
       editor.id = r.id;
     }
     editor.sucio = false;
@@ -520,7 +520,7 @@ window.addEventListener('beforeunload', e => {
 (async function iniciar() {
   if (!sesion || sesion.tipo !== 'admin') return;
   try {
-    const data = await apiAdmin('GET', '/api/admin/sesion');
+    const data = await apiAdmin('GET', 'api/admin/sesion');
     if (data.nombre && data.nombre !== sesion.nombre) {
       sesion.nombre = data.nombre;
       guardarSesion(sesion);

@@ -167,7 +167,7 @@ async function cargar() {
   }
 
   try {
-    const data = await api('/api/claves/' + encodeURIComponent(id));
+    const data = await api('api/claves/' + encodeURIComponent(id));
     clave = data.clave;
     document.title = clave.titulo + ' · DICIFO';
     tituloEl.innerHTML = tituloConCursiva(clave.titulo, clave.grupo);

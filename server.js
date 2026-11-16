@@ -9,10 +9,14 @@ const { hashPassword, verificarPassword } = require('./auth');
 const app = express();
 const PORT = process.env.PORT || 3001;
 
+// Toda la app vive bajo /claves para poder compartir dominio con el herbario
+const BASE = '/claves';
+const ruta = express.Router();
+
 // ngrok y otros proxies locales envían la IP real del visitante
 app.set('trust proxy', 'loopback');
-app.use(express.json({ limit: '1mb' }));
-app.use(express.static(path.join(__dirname, 'public'), {
+ruta.use(express.json({ limit: '1mb' }));
+ruta.use(express.static(path.join(__dirname, 'public'), {
   setHeaders(res, filePath) {
     // El service worker nunca debe quedar en caché del navegador
     if (filePath.endsWith('sw.js')) res.setHeader('Cache-Control', 'no-cache');
@@ -22,7 +26,7 @@ app.use(express.static(path.join(__dirname, 'public'), {
 /* ================= Consulta pública ================= */
 
 // Lista de claves con sus especies (para buscar por especie sin conexión)
-app.get('/api/claves', async (req, res) => {
+ruta.get('/api/claves', async (req, res) => {
   try {
     const [rows] = await pool.query(`
       SELECT c.id, c.titulo, c.grupo, c.descripcion,
@@ -39,7 +43,7 @@ app.get('/api/claves', async (req, res) => {
 });
 
 // Una clave completa (se navega en el navegador, así funciona sin internet)
-app.get('/api/claves/:id', async (req, res) => {
+ruta.get('/api/claves/:id', async (req, res) => {
   const id = parseInt(req.params.id, 10);
   if (!Number.isInteger(id)) return res.status(400).json({ error: 'Id inválido' });
   try {
@@ -60,7 +64,7 @@ app.get('/api/claves/:id', async (req, res) => {
   }
 });
 
-app.get('/api/salud', (req, res) => res.json({ ok: true }));
+ruta.get('/api/salud', (req, res) => res.json({ ok: true }));
 
 /* ================= Administrador ================= */
 
@@ -88,7 +92,7 @@ function requiereAdmin(req, res, next) {
   next();
 }
 
-app.post('/api/admin/login', async (req, res) => {
+ruta.post('/api/admin/login', async (req, res) => {
   const ip = req.ip;
   const registro = intentos.get(ip);
   if (registro && registro.hasta > Date.now()) {
@@ -129,12 +133,12 @@ app.post('/api/admin/login', async (req, res) => {
   }
 });
 
-app.post('/api/admin/logout', requiereAdmin, (req, res) => {
+ruta.post('/api/admin/logout', requiereAdmin, (req, res) => {
   sesiones.delete(req.token);
   res.json({ ok: true });
 });
 
-app.get('/api/admin/sesion', requiereAdmin, (req, res) => {
+ruta.get('/api/admin/sesion', requiereAdmin, (req, res) => {
   res.json({ nombre: req.admin.nombre });
 });
 
@@ -174,7 +178,7 @@ async function insertarOpciones(conn, claveId, opciones) {
      VALUES ?`, [filas]);
 }
 
-app.post('/api/admin/claves', requiereAdmin, async (req, res) => {
+ruta.post('/api/admin/claves', requiereAdmin, async (req, res) => {
   const datos = limpiarClave(req.body || {});
   const errores = revisar(datos);
   if (errores.length) return res.status(400).json({ error: 'La clave tiene errores', errores });
@@ -197,7 +201,7 @@ app.post('/api/admin/claves', requiereAdmin, async (req, res) => {
   }
 });
 
-app.put('/api/admin/claves/:id', requiereAdmin, async (req, res) => {
+ruta.put('/api/admin/claves/:id', requiereAdmin, async (req, res) => {
   const id = parseInt(req.params.id, 10);
   if (!Number.isInteger(id)) return res.status(400).json({ error: 'Id inválido' });
 
@@ -228,7 +232,7 @@ app.put('/api/admin/claves/:id', requiereAdmin, async (req, res) => {
   }
 });
 
-app.delete('/api/admin/claves/:id', requiereAdmin, async (req, res) => {
+ruta.delete('/api/admin/claves/:id', requiereAdmin, async (req, res) => {
   const id = parseInt(req.params.id, 10);
   if (!Number.isInteger(id)) return res.status(400).json({ error: 'Id inválido' });
   try {
@@ -241,6 +245,17 @@ app.delete('/api/admin/claves/:id', requiereAdmin, async (req, res) => {
   }
 });
 
+// /claves (sin diagonal) → /claves/ para que las rutas relativas funcionen
+app.use((req, res, next) => {
+  if (req.path === BASE) {
+    const query = req.originalUrl.slice(req.path.length);
+    return res.redirect(301, BASE + '/' + query);
+  }
+  next();
+});
+app.get('/', (req, res) => res.redirect(BASE + '/'));
+app.use(BASE, ruta);
+
 app.listen(PORT, () => {
-  console.log(`Claves dicotómicas en http://localhost:${PORT}`);
+  console.log(`Claves dicotómicas en http://localhost:${PORT}${BASE}/`);
 });

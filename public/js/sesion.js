@@ -15,7 +15,7 @@ function guardarSesion(sesion) {
 }
 
 function irALogin(parametros = '') {
-  location.replace('/login.html' + parametros);
+  location.replace('login.html' + parametros);
 }
 
 // requiere: 'cualquiera' (alumno o admin) o 'admin'
@@ -30,7 +30,7 @@ async function cerrarSesion() {
   const s = leerSesion();
   if (s && s.tipo === 'admin' && s.token) {
     try {
-      await fetch('/api/admin/logout', {
+      await fetch('api/admin/logout', {
         method: 'POST',
         headers: { 'ngrok-skip-browser-warning': '1', 'Authorization': 'Bearer ' + s.token }
       });
@@ -55,10 +55,10 @@ function pintarBarraSesion(opciones = {}) {
   }</span>`];
 
   if (s.tipo === 'admin' && opciones.enlaceAdmin !== false) {
-    partes.push('<a href="/admin.html">Administrar</a>');
+    partes.push('<a href="admin.html">Administrar</a>');
   }
   if (opciones.enlaceCatalogo) {
-    partes.push('<a href="/">Ver catálogo</a>');
+    partes.push('<a href="./">Ver catálogo</a>');
   }
   partes.push('<button type="button" class="enlace-sesion" id="btn-cerrar-sesion">Cerrar sesión</button>');
 
@@ -70,7 +70,7 @@ function pintarBarraSesion(opciones = {}) {
 }
 
 // Revisión inmediata, antes de que se pinte la página:
-// <script src="/js/sesion.js" data-requiere="cualquiera"></script>
+// <script src="js/sesion.js" data-requiere="cualquiera"></script>
 (function () {
   const script = document.currentScript;
   const requiere = script && script.dataset.requiere;

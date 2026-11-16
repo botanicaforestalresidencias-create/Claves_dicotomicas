@@ -1,24 +1,28 @@
 // Cambia VERSION cada vez que modifiques HTML, CSS o JS
-const VERSION = 'v5';
+const VERSION = 'v6';
 const CACHE_APP = `claves-app-${VERSION}`;
 const CACHE_DATOS = 'claves-datos'; // se conserva entre versiones
 
+// Carpeta donde vive la app (p. ej. /claves/). Todo se calcula a partir de aquí,
+// así funciona igual en localhost:3001/claves/ que en el dominio del herbario.
+const BASE = new URL('./', self.location).pathname;
+
 const SHELL = [
-  '/',
-  '/index.html',
-  '/clave.html',
-  '/login.html',
-  '/css/estilos.css',
-  '/css/login.css',
-  '/js/comun.js',
-  '/js/lista.js',
-  '/js/clave.js',
-  '/js/sesion.js',
-  '/js/login.js',
-  '/manifest.json',
-  '/icons/icon-192.png',
-  '/icons/icon-512.png'
-];
+  './',
+  'index.html',
+  'clave.html',
+  'login.html',
+  'css/estilos.css',
+  'css/login.css',
+  'js/comun.js',
+  'js/lista.js',
+  'js/clave.js',
+  'js/sesion.js',
+  'js/login.js',
+  'manifest.json',
+  'icons/icon-192.png',
+  'icons/icon-512.png'
+].map(ruta => new URL(ruta, self.location).href);
 
 const CABECERAS = { 'ngrok-skip-browser-warning': '1' };
 
@@ -41,6 +45,7 @@ self.addEventListener('install', event => {
 
 self.addEventListener('activate', event => {
   event.waitUntil((async () => {
+    // Solo borra cachés viejas de esta app; el herbario comparte el dominio
     const nombres = await caches.keys();
     await Promise.all(nombres
       .filter(n => n.startsWith('claves-app-') && n !== CACHE_APP)
@@ -54,14 +59,17 @@ self.addEventListener('fetch', event => {
   if (req.method !== 'GET') return;
 
   const url = new URL(req.url);
-  if (url.origin !== location.origin) return;
-  // El administrador siempre va directo al servidor
-  if (url.pathname.startsWith('/api/admin') || url.pathname === '/admin.html' || url.pathname === '/js/admin.js') return;
+  if (url.origin !== location.origin || !url.pathname.startsWith(BASE)) return;
 
-  if (url.pathname.startsWith('/api/')) {
-    event.respondWith(redPrimero(url.pathname + url.search));
+  const ruta = url.pathname.slice(BASE.length); // p. ej. "api/claves" o "clave.html"
+
+  // El administrador siempre va directo al servidor
+  if (ruta.startsWith('api/admin') || ruta === 'admin.html' || ruta === 'js/admin.js') return;
+
+  if (ruta.startsWith('api/')) {
+    event.respondWith(redPrimero(url.origin + url.pathname + url.search));
   } else {
-    event.respondWith(cachePrimero(event, url.pathname));
+    event.respondWith(cachePrimero(event, url.origin + url.pathname));
   }
 });
 
@@ -87,13 +95,13 @@ async function redPrimero(clave) {
 
 // Archivos de la app: responde con caché y actualiza en segundo plano.
 // Se usa solo la ruta (sin ?id=...) para que clave.html sirva a todas las claves.
-async function cachePrimero(event, ruta) {
+async function cachePrimero(event, clave) {
   const cache = await caches.open(CACHE_APP);
-  const guardada = await cache.match(ruta);
+  const guardada = await cache.match(clave);
 
-  const actualizar = pedir(ruta)
+  const actualizar = pedir(clave)
     .then(r => {
-      if (r.ok) cache.put(ruta, r.clone());
+      if (r.ok) cache.put(clave, r.clone());
       return r;
     })
     .catch(() => null);
@@ -106,7 +114,7 @@ async function cachePrimero(event, ruta) {
   const r = await actualizar;
   if (r) return r;
   if (event.request.mode === 'navigate') {
-    return (await cache.match('/index.html')) || Response.error();
+    return (await cache.match(new URL('index.html', self.location).href)) || Response.error();
   }
   return Response.error();
 }

@@ -28,7 +28,7 @@ function pintar() {
     const nombres = especies.map(e => `<em>${esc(abreviar(e))}</em>`).join(', ');
 
     return `<li>
-      <a class="entrada" href="/clave.html?id=${c.id}">
+      <a class="entrada" href="clave.html?id=${c.id}">
         ${c.grupo ? `<span class="entrada-grupo">${esc(c.grupo)}</span>` : ''}
         <h3>${tituloConCursiva(c.titulo, c.grupo)}</h3>
         <span class="entrada-meta">${total} →</span>
@@ -42,13 +42,13 @@ function pintar() {
 function precargarClaves() {
   if (!navigator.onLine) return;
   claves.forEach(c => {
-    fetch('/api/claves/' + c.id, { headers: API_HEADERS }).catch(() => {});
+    fetch('api/claves/' + c.id, { headers: API_HEADERS }).catch(() => {});
   });
 }
 
 async function cargar() {
   try {
-    claves = await api('/api/claves');
+    claves = await api('api/claves');
     pintar();
     precargarClaves();
   } catch (err) {
