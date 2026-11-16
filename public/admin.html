@@ -8,32 +8,23 @@
   <title>Administración · Claves dicotómicas</title>
   <link rel="icon" href="/icons/icon-192.png">
   <link rel="stylesheet" href="/css/estilos.css">
+  <script src="/js/sesion.js" data-requiere="admin"></script>
 </head>
 <body>
   <header class="encabezado">
-    <div class="encabezado-inst">Universidad Autónoma Chapingo · División de Ciencias Forestales</div>
+    <div class="encabezado-inst">
+      <span>Universidad Autónoma Chapingo · División de Ciencias Forestales</span>
+      <div id="barra-sesion" class="barra-sesion"></div>
+    </div>
     <div class="encabezado-fila">
       <div class="encabezado-texto">
         <h1>Administración de claves</h1>
         <p class="subtitulo">Captura y edición de claves dicotómicas</p>
       </div>
-      <button id="btn-salir" class="boton-claro oculto" type="button">Cerrar sesión</button>
     </div>
   </header>
 
   <main>
-    <!-- Inicio de sesión -->
-    <section id="vista-login" class="oculto">
-      <form id="form-login" class="panel panel-angosto">
-        <h2 class="seccion-titulo">Iniciar sesión</h2>
-        <label class="campo">
-          <span>Contraseña</span>
-          <input type="password" id="password" required autocomplete="current-password">
-        </label>
-        <p id="login-error" class="error-texto"></p>
-        <button class="boton primario" type="submit">Entrar</button>
-      </form>
-    </section>
 
     <!-- Lista de claves -->
     <section id="vista-lista" class="oculto">

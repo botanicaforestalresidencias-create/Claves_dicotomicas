@@ -196,3 +196,5 @@ async function cargar() {
 }
 
 cargar();
+
+pintarBarraSesion();

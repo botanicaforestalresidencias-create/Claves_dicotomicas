@@ -66,3 +66,5 @@ buscador.addEventListener('input', () => {
 });
 
 cargar();
+
+pintarBarraSesion();

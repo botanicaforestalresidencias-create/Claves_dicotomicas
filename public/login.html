@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#1f4a36">
+  <title>Acceso · Claves dicotómicas DICIFO</title>
+  <link rel="manifest" href="/manifest.json">
+  <link rel="icon" href="/icons/icon-192.png">
+  <link rel="apple-touch-icon" href="/icons/icon-192.png">
+  <link rel="stylesheet" href="/css/estilos.css">
+  <link rel="stylesheet" href="/css/login.css">
+  <script src="/js/sesion.js"></script>
+</head>
+<body class="pagina-login">
+  <div class="login-layout">
+
+    <!-- Presentación -->
+    <section class="login-hero" aria-label="Presentación">
+      <svg class="hero-hoja" viewBox="0 0 200 300" aria-hidden="true">
+        <path d="M100 290 C 20 220, 10 110, 100 10 C 190 110, 180 220, 100 290 Z" />
+        <path d="M100 290 V 20 M100 230 L 55 185 M100 230 L 145 185 M100 175 L 45 120 M100 175 L 155 120
+                 M100 120 L 60 75 M100 120 L 140 75" />
+      </svg>
+
+      <div class="hero-contenido">
+        <p class="hero-inst">Universidad Autónoma Chapingo<br>División de Ciencias Forestales</p>
+
+        <h1 class="hero-titulo">Claves<br>dicotómicas</h1>
+        <p class="hero-sub">Identificación de especies forestales mediante dilemas
+          de caracteres morfológicos.</p>
+
+        <figure class="hero-arbol">
+          <svg id="arbol" viewBox="0 58 360 240" role="img"
+               aria-label="Esquema de una clave dicotómica: cada dilema se divide en dos opciones hasta llegar a la especie"></svg>
+          <figcaption id="arbol-ruta" class="arbol-ruta" aria-live="off">&nbsp;</figcaption>
+        </figure>
+
+        <dl class="hero-cifras">
+          <div><dt>Claves</dt><dd id="cifra-claves">—</dd></div>
+          <div><dt>Especies</dt><dd id="cifra-especies">—</dd></div>
+        </dl>
+      </div>
+    </section>
+
+    <!-- Acceso -->
+    <section class="login-panel">
+      <div class="login-card" id="login-card">
+        <p class="login-saludo">Bienvenida, bienvenido</p>
+        <h2 class="login-titulo">Acceso al sistema</h2>
+
+        <p id="aviso-login" class="aviso oculto" role="status"></p>
+
+        <div class="selector" role="tablist" aria-label="Tipo de acceso">
+          <button type="button" role="tab" id="pest-alumno" aria-controls="tab-alumno"
+                  aria-selected="true" data-tab="alumno">Alumno</button>
+          <button type="button" role="tab" id="pest-admin" aria-controls="tab-admin"
+                  aria-selected="false" data-tab="admin" tabindex="-1">Administrador</button>
+          <span class="selector-indicador" aria-hidden="true"></span>
+        </div>
+
+        <!-- Alumno -->
+        <div class="pestana activa" id="tab-alumno" role="tabpanel" aria-labelledby="pest-alumno">
+          <ul class="beneficios">
+            <li>
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>
+              <span>Consulta todas las claves del catálogo</span>
+            </li>
+            <li>
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>
+              <span>Funciona en campo, sin internet, después de abrirla una vez</span>
+            </li>
+            <li>
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>
+              <span>Sin registro ni contraseña</span>
+            </li>
+          </ul>
+          <button id="btn-alumno" class="boton primario boton-ancho boton-grande" type="button">
+            <span class="texto-boton">Comenzar consulta</span>
+            <span class="flecha" aria-hidden="true">→</span>
+          </button>
+        </div>
+
+        <!-- Administrador -->
+        <div class="pestana" id="tab-admin" role="tabpanel" aria-labelledby="pest-admin" hidden>
+          <form id="form-admin" autocomplete="on" novalidate>
+            <div class="campo-flotante">
+              <input id="usuario" name="username" placeholder=" " required
+                     autocomplete="username" autocapitalize="none" spellcheck="false">
+              <label for="usuario">Usuario</label>
+              <svg class="campo-icono" viewBox="0 0 24 24" aria-hidden="true">
+                <circle cx="12" cy="8" r="4"/><path d="M4 20c1.5-4 4.5-6 8-6s6.5 2 8 6"/>
+              </svg>
+            </div>
+
+            <div class="campo-flotante">
+              <input id="password" name="password" type="password" placeholder=" " required
+                     autocomplete="current-password">
+              <label for="password">Contraseña</label>
+              <button type="button" id="ver-password" class="ver-password"
+                      aria-label="Mostrar contraseña" aria-pressed="false">
+                <svg class="ojo-abierto" viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>
+                </svg>
+                <svg class="ojo-cerrado" viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M3 3l18 18M10.6 5.1A10 10 0 0 1 12 5c6.5 0 10 7 10 7a17 17 0 0 1-3.2 4.2M6.6 6.6C3.8 8.4 2 12 2 12s3.5 7 10 7a9.7 9.7 0 0 0 5.4-1.6M9.9 9.9a3 3 0 0 0 4.2 4.2"/>
+                </svg>
+              </button>
+            </div>
+
+            <p id="aviso-mayus" class="aviso-mayus" hidden>Bloq Mayús está activado</p>
+            <p id="login-error" class="error-texto" role="alert"></p>
+
+            <button id="btn-admin" class="boton primario boton-ancho boton-grande" type="submit">
+              <span class="texto-boton">Iniciar sesión</span>
+              <span class="spinner" aria-hidden="true"></span>
+            </button>
+          </form>
+        </div>
+      </div>
+
+      <p class="login-pie">Herramienta académica de apoyo a la docencia en botánica forestal</p>
+    </section>
+  </div>
+
+  <div class="estado-red">Sin conexión · usando datos guardados</div>
+
+  <script src="/js/comun.js"></script>
+  <script src="/js/login.js"></script>
+</body>
+</html>

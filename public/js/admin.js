@@ -1,17 +1,13 @@
 const $ = id => document.getElementById(id);
-const CLAVE_TOKEN = 'claves_admin_token';
 
-let token = null;
-try { token = sessionStorage.getItem(CLAVE_TOKEN); } catch (e) { /* sin almacenamiento */ }
-
+const sesion = leerSesion(); // ya se verificó en sesion.js que es administrador
 let editor = null; // { id, dilemas: [{ paso, a, b }], sucio }
 
 /* ================= Utilidades ================= */
 
 function mostrarVista(nombre) {
-  ['login', 'lista', 'editor'].forEach(v =>
+  ['lista', 'editor'].forEach(v =>
     $('vista-' + v).classList.toggle('oculto', v !== nombre));
-  $('btn-salir').classList.toggle('oculto', nombre === 'login');
   window.scrollTo(0, 0);
 }
 
@@ -23,12 +19,9 @@ function avisar(mensaje, tipo = 'ok') {
   avisar.tiempo = setTimeout(() => { t.className = 'toast'; }, 3500);
 }
 
-function guardarToken(valor) {
-  token = valor;
-  try {
-    if (valor) sessionStorage.setItem(CLAVE_TOKEN, valor);
-    else sessionStorage.removeItem(CLAVE_TOKEN);
-  } catch (e) { /* sin almacenamiento */ }
+function sesionExpirada() {
+  guardarSesion(null);
+  location.replace('/login.html?admin=1&expirada=1');
 }
 
 async function apiAdmin(metodo, ruta, cuerpo) {
@@ -37,13 +30,13 @@ async function apiAdmin(metodo, ruta, cuerpo) {
     headers: {
       ...API_HEADERS,
       'Content-Type': 'application/json',
-      'Authorization': 'Bearer ' + token
+      'Authorization': 'Bearer ' + (sesion && sesion.token)
     },
     body: cuerpo ? JSON.stringify(cuerpo) : undefined
   });
   const data = await r.json().catch(() => ({}));
   if (r.status === 401) {
-    cerrarSesion('La sesión expiró. Vuelve a entrar.');
+    sesionExpirada();
     throw new Error('401');
   }
   if (!r.ok) {
@@ -54,45 +47,17 @@ async function apiAdmin(metodo, ruta, cuerpo) {
   return data;
 }
 
-/* ================= Sesión ================= */
-
-$('form-login').addEventListener('submit', async e => {
-  e.preventDefault();
-  $('login-error').textContent = '';
-  try {
-    const r = await fetch('/api/admin/login', {
-      method: 'POST',
-      headers: { ...API_HEADERS, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ password: $('password').value })
-    });
-    const data = await r.json().catch(() => ({}));
-    if (!r.ok) throw new Error(data.error || 'No se pudo iniciar sesión');
-    guardarToken(data.token);
-    $('password').value = '';
-    cargarLista();
-  } catch (err) {
-    $('login-error').textContent = err.message;
-  }
-});
-
-function cerrarSesion(mensaje) {
-  if (token) {
-    fetch('/api/admin/logout', {
-      method: 'POST',
-      headers: { ...API_HEADERS, 'Authorization': 'Bearer ' + token }
-    }).catch(() => {});
-  }
-  guardarToken(null);
-  editor = null;
-  $('login-error').textContent = mensaje || '';
-  mostrarVista('login');
-  $('password').focus();
+function hayCambiosSinGuardar() {
+  return editor && editor.sucio;
 }
 
-$('btn-salir').addEventListener('click', () => {
-  if (editor && editor.sucio && !confirm('Hay cambios sin guardar. ¿Cerrar sesión de todos modos?')) return;
-  cerrarSesion();
-});
+const OPCIONES_BARRA = {
+  enlaceAdmin: false,
+  enlaceCatalogo: true,
+  antesDeSalir: () => !hayCambiosSinGuardar() ||
+    confirm('Hay cambios sin guardar. ¿Cerrar sesión de todos modos?')
+};
+pintarBarraSesion(OPCIONES_BARRA);
 
 /* ================= Lista ================= */
 
@@ -553,11 +518,20 @@ window.addEventListener('beforeunload', e => {
 });
 
 (async function iniciar() {
-  if (!token) return cerrarSesion();
+  if (!sesion || sesion.tipo !== 'admin') return;
   try {
-    await apiAdmin('GET', '/api/admin/sesion');
+    const data = await apiAdmin('GET', '/api/admin/sesion');
+    if (data.nombre && data.nombre !== sesion.nombre) {
+      sesion.nombre = data.nombre;
+      guardarSesion(sesion);
+      pintarBarraSesion(OPCIONES_BARRA);
+    }
     cargarLista();
   } catch (err) {
-    if (err.message !== '401') cerrarSesion('No se pudo conectar con el servidor.');
+    if (err.message !== '401') {
+      mostrarVista('lista');
+      $('admin-lista').innerHTML = '<li class="vacio">No se pudo conectar con el servidor. ' +
+        'El administrador necesita internet.</li>';
+    }
   }
 })();

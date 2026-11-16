@@ -23,13 +23,23 @@ pm2 save
 
 Abre http://localhost:3001
 
-## Administrador
+## Acceso
 
-Agrega en `.env` la línea `ADMIN_PASSWORD=tu-contraseña` y reinicia el servidor.
-Entra a http://localhost:3001/admin.html
+La página de inicio (`/login.html`) tiene dos entradas:
 
-Desde ahí se crean, editan y eliminan claves. También se pueden importar desde
-un CSV con las columnas `dilema, opcion, descripcion, siguiente, especie`
+- **Alumnos:** botón "Entrar como alumno", sin registro.
+- **Administradores:** usuario y contraseña.
+
+Para crear un administrador (o cambiar su contraseña):
+
+```bash
+node crear-admin.js usuario contraseña "Nombre completo"
+```
+
+En una base que ya existía, crea antes la tabla con `sql/administradores.sql`.
+
+Desde el administrador se crean, editan y eliminan claves. También se pueden importar
+desde un CSV con las columnas `dilema, opcion, descripcion, siguiente, especie`
 (en Excel: Guardar como → CSV UTF-8). La opción puede escribirse `a`/`b` o `1`/`1'`.
 
 ## Estructura

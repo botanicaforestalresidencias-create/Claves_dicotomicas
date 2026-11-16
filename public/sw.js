@@ -1,5 +1,5 @@
 // Cambia VERSION cada vez que modifiques HTML, CSS o JS
-const VERSION = 'v3';
+const VERSION = 'v5';
 const CACHE_APP = `claves-app-${VERSION}`;
 const CACHE_DATOS = 'claves-datos'; // se conserva entre versiones
 
@@ -7,10 +7,14 @@ const SHELL = [
   '/',
   '/index.html',
   '/clave.html',
+  '/login.html',
   '/css/estilos.css',
+  '/css/login.css',
   '/js/comun.js',
   '/js/lista.js',
   '/js/clave.js',
+  '/js/sesion.js',
+  '/js/login.js',
   '/manifest.json',
   '/icons/icon-192.png',
   '/icons/icon-512.png'
