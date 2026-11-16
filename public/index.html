@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#1f4a36">
+  <title>Claves dicotómicas · DICIFO</title>
+  <link rel="manifest" href="/manifest.json">
+  <link rel="icon" href="/icons/icon-192.png">
+  <link rel="apple-touch-icon" href="/icons/icon-192.png">
+  <link rel="stylesheet" href="/css/estilos.css">
+</head>
+<body>
+  <header class="encabezado">
+    <div class="encabezado-inst">Universidad Autónoma Chapingo · División de Ciencias Forestales</div>
+    <div class="encabezado-fila">
+      <div>
+        <h1>Claves dicotómicas</h1>
+        <p class="subtitulo">Identificación de especies forestales</p>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section class="intro">
+      <h2 class="seccion-titulo">Catálogo de claves</h2>
+      <p>Selecciona una clave y resuelve cada dilema comparando los caracteres del ejemplar
+         con las dos opciones que se presentan, hasta llegar a la determinación.</p>
+    </section>
+
+    <input id="buscador" class="buscador" type="search"
+           placeholder="Buscar por género, familia o especie" autocomplete="off">
+
+    <div id="aviso"></div>
+    <p id="conteo" class="conteo"></p>
+    <ul id="lista" class="lista">
+      <li class="vacio">Cargando claves…</li>
+    </ul>
+  </main>
+
+  <footer class="pie">División de Ciencias Forestales · Universidad Autónoma Chapingo
+    <p> Desarrollado por Residente de la carrera de Ingeniería en tecnologías de la información y comunicaciones Amellalli Rojas Miranda</p>
+  </footer>
+  <div class="estado-red">Sin conexión · usando datos guardados</div>
+
+  <script src="/js/comun.js"></script>
+  <script src="/js/lista.js"></script>
+</body>
+</html>
